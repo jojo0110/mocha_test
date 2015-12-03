@@ -6,20 +6,10 @@ var assert=require('assert'),
     agent = request.agent(app);
 
 
-
-/*
-afterEach(function() {
-    // runs after each test in this block
-});
-*/
 request=request(app);
 
 var _validObj={};
 var _nonValidObj={};
-
-
-
-
 
 beforeEach(function() {
     _validObj={name:'joe',password:'password'}
@@ -43,9 +33,9 @@ describe('util tests',function(){
     })
 })
 
-
 describe('route tests',function() {
-
+    let testCookie;
+    let postRes;
     describe('when GET /', function () {
 
         it('it should return 200', function (done) {
@@ -63,8 +53,7 @@ describe('route tests',function() {
 
     describe('if login success', function () {
 
-        let testCookie;
-        let postRes;
+
         beforeEach(function(done) {
             request
                 .post('/login')
@@ -81,8 +70,6 @@ describe('route tests',function() {
         });
 
         describe('after POST /login', function () {
-
-
             it('it should create a cookie', function (done) {
                 assert(postRes.header['set-cookie']);
                 done();
@@ -161,71 +148,87 @@ describe('route tests',function() {
         });
 
     })
-})
-
-
-/*To be continued.......
-        describe('when Get /logout',function(){
-            it('it should clear cookie',function(){
-                assert(200==200);
-            });
-            it('location should be /index',function(){
-                assert(200==200);
-            });
-        });
-    });
 
     describe('if login failed',function(){
 
-        describe('when POST /login',function(){
-            it('it should not create a cookie',function(){
+        beforeEach(function(done) {
+            request
+                .post('/login')
+                .set('Accept', 'application/json')
+                .type('urlencoded')
+                .send(_nonValidObj)
+                .end(function (err, res) {
+                    postRes=res;
+                    if(res.headers['set-cookie'])
+                        testCookie=res.headers['set-cookie'].pop().split(';')[0];
+                    else
+                        testCookie=null;
+                    if (err)
+                        return done(err)
+                    done();
+                })
+        });
 
-                assert(200==200);
+        describe('after POST /login',function(done){
+            it('it should have no cookie', function (done) {
+                assert(!postRes.header['set-cookie']);
+                done();
 
             })
-            it('it should show not valid info',function(){
-                assert(200==200);
+
+            it('location should be in /login', function (done) {
+                assert.equal('/login', postRes.header['location']);
+                done();
+            })
+        })
+
+        describe('when GET /login', function () {
+
+            it('it should have no cookie', function (done) {
+                assert(!testCookie);
+                done();
+            })
+            it('location should be /login', function (done) {
+                var req=request.get('/login')
+                req.set( 'Cookie', testCookie)
+                req.end(function (err, res) {
+                    assert.equal('/login',res.header['location']);
+
+                    if (err)
+                        return done(err)
+                    done();
+
+                })
+
 
             })
         })
 
-        describe('when GET /login',function(){
-            it('it should have no cookie',function(){
-                request
-                    .get('/login')
-                    .set('Accept','application/json')
-                    .end(function(err,res){
+        describe('when GET /userArea/:id',function(){
+            let evenIdRes;
+            beforeEach(function(done){
+                let req=request.get('/userArea/12')
+                req.set( 'Cookie', testCookie)
+                req.end(function(err,res){
+                    evenIdRes=res;
 
-                        assert(!res.cookie[cuser]);
-                        if(err)
-                            return done(err);
-                        done();
-                    });
+                    if(err)
+                        return done(err);
+                    done();
+                })
 
             })
-            it('location should be /login',function(){
-                assert(200==200);
-
-        });
-
-        describe('when GET /userArea/:id',function(){
-            it('it should have no cookie',function(){
-                assert(200==200);
+            it('it should have no cookie',function(done){
+                assert(!testCookie);
+                done();
             });
-            it('location should be /login',function(){
-                assert(200==200);
+            it('location should be /login',function(done){
+                assert.equal('/login',evenIdRes.header['location']);
+                done();
             });
         });
 
-        describe('when Get /logout',function(){
-            it('it should clear cookie',function(){
-                assert(200==200);
-            });
-            it('location should be /index',function(){
-                assert(200==200);
-            });
-        });
-    });
+    })
 
 })
 
@@ -246,7 +249,9 @@ describe('other tests',function(){
     })
 
 })
-*/
+
+
+
 
 
 
