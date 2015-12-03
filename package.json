@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test":"mocha",
+    "test": "mocha",
     "start": "node ./bin/www"
   },
   "dependencies": {
@@ -13,10 +13,11 @@
     "ejs": "~2.3.3",
     "express": "~4.13.1",
     "morgan": "~1.6.1",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "supertest": "^1.1.0"
   },
-"devDependencies":{
-	"mocha":"2.3.4",
-	"supertest":"~1.1.0"   
-	}
+  "devDependencies": {
+    "mocha": "2.3.4",
+    "supertest": "1.1.0"
+  }
 }

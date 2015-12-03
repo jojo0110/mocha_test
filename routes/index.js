@@ -2,19 +2,28 @@ var express = require('express');
 var router = express.Router();
 var util=require('../util');
 
+
+
 /* GET home page. */
 router.route('/')
+    .all(function(req,res,next){
+        res.location('/');
+        next();
+    })
     .get(function(req, res, next) {
         res.render('index', { title: 'Express',result:''});
     });
 
 router.route('/login')
     .all(function(req,res,next){
+        res.location('/login');
         next();
     })
     .get(function(req,res,next){
-        if(req.signedCookies['cuser'])
-            res.render('index',{'title':req.signedCookies['cuser'].userName,result:'you already log in'})
+        if(req.signedCookies['cuser']) {
+            res.location('/');
+            res.render('index', {'title': req.signedCookies['cuser'].userName, result: 'you already log in'})
+        }
         else
             res.render('login',{userInfo:{}, result:''});
     })
@@ -24,7 +33,7 @@ router.route('/login')
         {
             //give a cookie
             res.cookie('cuser', {userName:req.body.name}, { expires:0 ,signed: true});
-
+            res.location('/');
             res.render('index',{'title':req.body.name,result:''})
         }
         else
@@ -34,6 +43,7 @@ router.route('/login')
 router.route('/logout')
     .get(function(req,res,next){
                 res.clearCookie('cuser', {signed: true});
+        res.location('/');
         res.redirect('/');
     });
 
@@ -41,13 +51,17 @@ router.route('/userArea/:id')
     .all(function(req,res,next){
         if(req.signedCookies['cuser'])
             next();
-        else
-            res.render('login',{userInfo:{}, result:''});
+        else {
+            res.location('/login');
+            res.render('login', {userInfo: {}, result: ''});
+        }
 
     })
     .get(function(req,res,next){
         if(util.validateId(req.params.id))
-        res.render('userArea',{title:'article'+req.params.id})
+        {   res.location('/userArea');
+            res.render('userArea',{title:'article'+req.params.id})
+        }
         else
         {
            next();

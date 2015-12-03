@@ -20,7 +20,7 @@ Util.prototype.validateId=function(id){
 
 Util.prototype.validateUser=function(userObj){
 
-    if(userObj['name']=='kuan')
+    if(userObj['name']=='joe')
         if(userObj['password']=='password')
             return true;
     else
